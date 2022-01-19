@@ -114,19 +114,23 @@ library(RColorBrewer)
 library(rpart.plot)
 library(matrixStats)
 
-# Reviewing if file is loaded in current directory
-path<-getwd()
-file<-"WA_Fn-UseC_-HR-Employee-Attrition.csv"
-filename<-paste(path,"/",file,sep="")
-if (file.exists(filename)) {
-  cat("Reading Attrition File")
-} else {
-  cat("Attrition file does not exist\n")
-  cat("Please load file: ", file,"at directory: ",path,"\n")
-  stop("Attrition file not found")
-}
+# load Attrition file (from github)
+
+data_attrition <- read.csv("https://raw.githubusercontent.com/cahuparra/attritiondata/ea7804d3c668c63c08854dee5a55e2d257896ea1/WA_Fn-UseC_-HR-Employee-Attrition.csv")
+
+# Code to read file from local drive
+# path<-getwd()
+# file<-"WA_Fn-UseC_-HR-Employee-Attrition.csv"
+# filename<-paste(path,"/",file,sep="")
+# if (file.exists(filename)) {
+#   cat("Reading Attrition File")
+# } else {
+#   cat("Attrition file does not exist\n")
+#   cat("Please load file: ", file,"at directory: ",path,"\n")
+#   stop("Attrition file not found")
+# }
 #load Attrition file
-data_attrition<-read.csv("./data/WA_Fn-UseC_-HR-Employee-Attrition.csv")
+#  data_attrition<-read.csv("./data/WA_Fn-UseC_-HR-Employee-Attrition.csv")
 
 ``` 
 

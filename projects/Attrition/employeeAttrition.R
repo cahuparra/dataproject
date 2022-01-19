@@ -1,8 +1,8 @@
-## ----setup, include=FALSE-----------------------------------------------------------------------------------------------------------------------------------------
+## ----setup, include=FALSE----------------------------------------------------
 knitr::opts_chunk$set(echo = TRUE)
 
 
-## ----dataset_upload,  message=FALSE, warning=FALSE----------------------------------------------------------------------------------------------------------------
+## ----dataset_upload,  message=FALSE, warning=FALSE---------------------------
 
 if(!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.us.r-project.org")
 if(!require(caret)) install.packages("caret", repos = "http://cran.us.r-project.org")
@@ -28,23 +28,27 @@ library(RColorBrewer)
 library(rpart.plot)
 library(matrixStats)
 
-# Reviewing if file is loaded in current directory
-path<-getwd()
-file<-"WA_Fn-UseC_-HR-Employee-Attrition.csv"
-filename<-paste(path,"/",file,sep="")
-if (file.exists(filename)) {
-  cat("Reading Attrition File")
-} else {
-  cat("Attrition file does not exist\n")
-  cat("Please load file: ", file,"at directory: ",path,"\n")
-  stop("Attrition file not found")
-}
+# load Attrition file (from github)
+
+data_attrition <- read.csv("https://raw.githubusercontent.com/cahuparra/attritiondata/ea7804d3c668c63c08854dee5a55e2d257896ea1/WA_Fn-UseC_-HR-Employee-Attrition.csv")
+
+# Code to read file from local drive
+# path<-getwd()
+# file<-"WA_Fn-UseC_-HR-Employee-Attrition.csv"
+# filename<-paste(path,"/",file,sep="")
+# if (file.exists(filename)) {
+#   cat("Reading Attrition File")
+# } else {
+#   cat("Attrition file does not exist\n")
+#   cat("Please load file: ", file,"at directory: ",path,"\n")
+#   stop("Attrition file not found")
+# }
 #load Attrition file
-data_attrition<-read.csv("./data/WA_Fn-UseC_-HR-Employee-Attrition.csv")
+#  data_attrition<-read.csv("./data/WA_Fn-UseC_-HR-Employee-Attrition.csv")
 
 
 
-## ----dataset_tyding,  message=FALSE, warning=FALSE----------------------------------------------------------------------------------------------------------------
+## ----dataset_tyding,  message=FALSE, warning=FALSE---------------------------
 # Convert to categorical, eliminate not relevant variables 
 set.seed(7, sample.kind = "Rounding") 
 data_clean<-data_attrition %>%
@@ -93,7 +97,7 @@ train_x <- train_x[-23]
 train_y <- data_clean$Attrition[-test_index]
 
 
-## ----dataset_split,  message=FALSE, warning=FALSE-----------------------------------------------------------------------------------------------------------------
+## ----dataset_split,  message=FALSE, warning=FALSE----------------------------
 test_index<- createDataPartition(data_clean$Attrition,times = 1, p= 0.5, list=FALSE)
 test_set<-data_clean %>% slice(test_index)
 train_set<-data_clean %>% slice(-test_index)
@@ -102,7 +106,7 @@ testnum_set<-data_numeric %>% slice(test_index)
 trainnum_set<-data_numeric %>% slice(-test_index)
 
 
-## ----tree_method,  message=FALSE, warning=FALSE-------------------------------------------------------------------------------------------------------------------
+## ----tree_method,  message=FALSE, warning=FALSE------------------------------
 
 #generate the tree
 train_rpart<-rpart(Attrition~., data=trainnum_set)
@@ -119,7 +123,7 @@ attr_results <- tibble(Method = "Regression Tree:", Accuracy = cc$overall["Accur
 attr_results %>% knitr::kable()
 
 
-## ----tree_pruned,  message=FALSE, warning=FALSE-------------------------------------------------------------------------------------------------------------------
+## ----tree_pruned,  message=FALSE, warning=FALSE------------------------------
 # Pruning Branches
 train_rpart <- train(Attrition ~ ., method = "rpart", tuneGrid = data.frame(cp = seq(0, 0.1, 0.002)), data = trainnum_set)  
 rpart_preds <- predict(train_rpart, testnum_set)
@@ -136,7 +140,7 @@ attr_results <- bind_rows(attr_results,tibble(Method = "Pruned Tree:", Accuracy 
 attr_results %>% knitr::kable()
 
 
-## ----Knn_PCA,  message=FALSE, warning=FALSE-----------------------------------------------------------------------------------------------------------------------
+## ----Knn_PCA,  message=FALSE, warning=FALSE----------------------------------
 # Perform a principal component analysis of the scaled matrix.
 # exclude Attrition from trainnum_set
 Attrition<-trainnum_set$Attrition
@@ -176,7 +180,7 @@ attr_results <- bind_rows(attr_results,tibble(Method = "Knn_PCA", Accuracy = cc$
 attr_results %>% knitr::kable()
 
 
-## ----train_method_result,  message=FALSE, warning=FALSE-----------------------------------------------------------------------------------------------------------
+## ----train_method_result,  message=FALSE, warning=FALSE----------------------
 # look up gamLoess
 modelLookup("gamLoess") 
 models<-c("glm", "gamLoess", "knn", "rf","qda","lda")
@@ -206,7 +210,7 @@ attr_results %>% knitr::kable()
 
 
 
-## ----result,  message=FALSE, warning=FALSE------------------------------------------------------------------------------------------------------------------------
+## ----result,  message=FALSE, warning=FALSE-----------------------------------
 # Display variables by importance
 
 ggplot(varImp(fits[1]$glm)) + ggtitle("Variable Importance glm method")
